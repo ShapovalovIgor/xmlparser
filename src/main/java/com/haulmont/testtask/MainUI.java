@@ -2,6 +2,7 @@ package com.haulmont.testtask;
 
 
 import com.haulmont.testtask.DAO.Groups;
+import com.haulmont.testtask.UI.GroupsTable;
 import com.haulmont.testtask.database.HibernateUtil;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
@@ -44,11 +45,15 @@ public class MainUI extends UI {
 
 
         hibernateUtil.newTestGroups();
+
+
         List list = Collections.singletonList(hibernateUtil.getGroups().get(0).getFaculty() + hibernateUtil.getGroups().get(0).getId()+
                 hibernateUtil.getGroups().get(1).getFaculty() + hibernateUtil.getGroups().get(1).getId());
 
         ComboBox select = new ComboBox("", list);
-layout.addComponent(select);
+        GroupsTable groupsTable = new GroupsTable();
+layout.addComponent(groupsTable.table(hibernateUtil.getGroups()));
+//        layout.addComponent(select);
         setContent(layout);
     }
 }

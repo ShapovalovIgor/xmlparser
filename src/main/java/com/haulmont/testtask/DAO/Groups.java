@@ -3,7 +3,7 @@ package com.haulmont.testtask.DAO;
 import javax.persistence.*;
 @Entity
 @Table(name = "groups")
-public class Groups {
+public class Groups implements EditObject{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
