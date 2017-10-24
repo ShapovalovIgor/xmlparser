@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import com.haulmont.testtask.DAO.Groups;
 import com.vaadin.server.VaadinService;
+import javafx.print.Collation;
 import org.hibernate.*;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -97,14 +98,44 @@ public class HibernateUtil {
         return groupList;
     }
 
+    public boolean updateGroup(Groups groups){
+        Session session = sessionFactory.getCurrentSession();
+        Transaction tr = session.beginTransaction();
+        session.update(groups);
+        tr.commit();
+        session.close();
+        return true;
+    }
+
     public void newTestGroups() {
         Session session = sessionFactory.getCurrentSession();
         Transaction tr = session.beginTransaction();
-        Groups emp = new Groups();
-emp.setId(1488);
-        emp.setNumber(000000);
-        emp.setFaculty("Delhi - India");
-        session.save(emp);
+        Groups group = new Groups();
+        group.setId(14788);
+        group.setNumber(000000);
+        group.setFaculty("Delhi - India");
+        session.save(group);
+        tr.commit();
+        session.close();
+    }
+
+
+    public Groups addGroup(int number, String faculty) {
+        Session session = sessionFactory.getCurrentSession();
+        Transaction tr = session.beginTransaction();
+        Groups group = new Groups();
+        group.setNumber(number);
+        group.setFaculty(faculty);
+        session.save(group);
+        tr.commit();
+        session.close();
+        return  group;
+    }
+
+    public void removeGroup(Groups group) {
+        Session session = sessionFactory.getCurrentSession();
+        Transaction tr = session.beginTransaction();
+        session.delete(group);
         tr.commit();
         session.close();
     }

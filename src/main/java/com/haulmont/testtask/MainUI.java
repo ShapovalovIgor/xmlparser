@@ -19,10 +19,11 @@ import java.util.List;
 @SuppressWarnings("serial")
 @Theme(ValoTheme.THEME_NAME)
 public class MainUI extends UI {
+public static HibernateUtil hibernateUtil = null;
 
     @Override
     protected void init(VaadinRequest request) {
-        HibernateUtil hibernateUtil = null;
+
         try {
             hibernateUtil = new HibernateUtil();
 
@@ -52,8 +53,8 @@ public class MainUI extends UI {
 
         ComboBox select = new ComboBox("", list);
         GroupsTable groupsTable = new GroupsTable();
-layout.addComponent(groupsTable.table(hibernateUtil.getGroups()));
+//layout.addComponent();
 //        layout.addComponent(select);
-        setContent(layout);
+        setContent(groupsTable.table());
     }
 }
