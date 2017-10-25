@@ -14,48 +14,45 @@ import com.vaadin.server.VaadinService;
 import org.hibernate.*;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;
 
 public class HibernateUtil {
     public HibernateUtil() {
     }
+    private static final String PERSISTENT_UNIT_NAME = "item-manager-pu";
 
-    private static final SessionFactory sessionFactory;
-
+    private static final EntityManagerFactory emf;
 
     static {
         try {
-            StandardServiceRegistry standardRegistry =
-                    new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
-            Metadata metaData =
-                    new MetadataSources(standardRegistry).getMetadataBuilder().build();
-            sessionFactory = metaData.getSessionFactoryBuilder().build();
-        } catch (Throwable th) {
-
-            System.err.println("Enitial SessionFactory creation failed" + th);
-            throw new ExceptionInInitializerError(th);
-
+            emf = Persistence.createEntityManagerFactory(PERSISTENT_UNIT_NAME);
+        } catch (Throwable ex) {
+            throw new ExceptionInInitializerError(ex);
         }
     }
 
-    public static SessionFactory getSessionFactory() {
-
-        return sessionFactory;
-
+    public static EntityManager getEm() {
+        return emf.createEntityManager();
     }
+    
 
     @Transactional
     public void executeSQLCommand(String sql) throws Exception {
-        Session session = sessionFactory.openSession();
-        org.hibernate.Transaction tr = session.beginTransaction();
-        SQLQuery sqlQuery = session.createSQLQuery(sql);
-        sqlQuery.executeUpdate();
-        tr.commit();
-        session.close();
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        em.createNativeQuery(sql).executeUpdate();
+        em.getTransaction().commit();
+        em.close();
     }
 
     @Transactional
@@ -84,99 +81,88 @@ public class HibernateUtil {
     }
 
     public List<Group> getGroup() {
-        SessionFactory sessFact = HibernateUtil.getSessionFactory();
-        Session session = sessFact.getCurrentSession();
-        org.hibernate.Transaction tr = session.beginTransaction();
-
-        CriteriaQuery cq = session.getCriteriaBuilder().createQuery(Group.class);
+        EntityManager em = getEm();
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery(Group.class);
         cq.from(Group.class);
-        List groupList = session.createQuery(cq).getResultList();
-
-        tr.commit();
-        session.close();
+        List groupList = em.createQuery(cq).getResultList();
+        em.close();
         return groupList;
     }
 
     public List<Student> getStudent() {
-        SessionFactory sessFact = HibernateUtil.getSessionFactory();
-        Session session = sessFact.getCurrentSession();
-        org.hibernate.Transaction tr = session.beginTransaction();
-
-        CriteriaQuery cq = session.getCriteriaBuilder().createQuery(Student.class);
+        EntityManager em = getEm();
+        CriteriaQuery cq = em.getCriteriaBuilder().createQuery(Student.class);
         cq.from(Student.class);
-        List studentList = session.createQuery(cq).getResultList();
-
-        tr.commit();
-        session.close();
+        List studentList = em.createQuery(cq).getResultList();
+        em.close();
         return studentList;
     }
 
     public boolean updateGroup(Group group) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
-        session.update(group);
-        tr.commit();
-        session.close();
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        em.merge(group);
+        em.getTransaction().commit();
+        em.close();
         return true;
     }
 
     public boolean updateStudent(Student student) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
-        session.update(student);
-        tr.commit();
-        session.close();
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        em.merge(student);
+        em.getTransaction().commit();
+        em.close();
         return true;
     }
 
     public void newTestGroups() {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
+        EntityManager em = getEm();
+        em.getTransaction().begin();
         Group group = new Group();
-        group.setId(14788);
         group.setNumber(000000);
         group.setFaculty("Delhi - India");
-        session.save(group);
-        tr.commit();
-        session.close();
+        em.persist(group);
+        em.getTransaction().commit();
+        em.close();
     }
 
 
     public Group addGroup(int number, String faculty) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
+        EntityManager em = getEm();
         Group group = new Group(number, faculty);
-        session.save(group);
-        tr.commit();
-        session.close();
+        em.getTransaction().begin();
+        em.persist(group);
+        em.getTransaction().commit();
+        em.close();
         return group;
     }
 
     public Student addStudent(String firstname, String lastname, String secondname, Date dob, int group) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
+        EntityManager em = getEm();
         Student student = new Student(firstname, lastname, secondname, dob, group);
-        session.save(student);
-        tr.commit();
-        session.close();
+        em.getTransaction().begin();
+        em.persist(student);
+        em.getTransaction().commit();
+        em.close();
         return student;
     }
 
     public void removeGroup(Group group) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
-        session.delete(group);
-        tr.commit();
-        session.close();
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        em.remove(group);
+        em.getTransaction().commit();
+        em.close();
     }
 
 
     public void removeStudent(Student student) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tr = session.beginTransaction();
-        session.delete(student);
-        tr.commit();
-        session.close();
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        em.remove(student);
+        em.getTransaction().commit();
+        em.close();
     }
 
     public boolean createDB() {
