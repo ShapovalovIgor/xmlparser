@@ -14,7 +14,7 @@
         <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.hbm2ddl.auto">create-drop</property>
-        <mapping class="com.haulmont.testtask.DAO.Groups"></mapping>
-        <mapping class="com.haulmont.testtask.DAO.Students"></mapping>
+        <mapping class="com.haulmont.testtask.DAO.Group"></mapping>
+        <mapping class="com.haulmont.testtask.DAO.Student"></mapping>
     </session-factory>
 </hibernate-configuration>
