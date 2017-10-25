@@ -29,6 +29,7 @@ import javax.transaction.Transactional;
 public class HibernateUtil {
     public HibernateUtil() {
     }
+
     private static final String PERSISTENT_UNIT_NAME = "item-manager-pu";
 
     private static final EntityManagerFactory emf;
@@ -44,7 +45,7 @@ public class HibernateUtil {
     public static EntityManager getEm() {
         return emf.createEntityManager();
     }
-    
+
 
     @Transactional
     public void executeSQLCommand(String sql) throws Exception {
@@ -100,30 +101,24 @@ public class HibernateUtil {
 
     public boolean updateGroup(Group group) {
         EntityManager em = getEm();
-        em.getTransaction().begin();
         em.merge(group);
-        em.getTransaction().commit();
         em.close();
         return true;
     }
 
     public boolean updateStudent(Student student) {
         EntityManager em = getEm();
-        em.getTransaction().begin();
         em.merge(student);
-        em.getTransaction().commit();
         em.close();
         return true;
     }
 
     public void newTestGroups() {
         EntityManager em = getEm();
-        em.getTransaction().begin();
         Group group = new Group();
         group.setNumber(000000);
         group.setFaculty("Delhi - India");
         em.persist(group);
-        em.getTransaction().commit();
         em.close();
     }
 
@@ -131,9 +126,7 @@ public class HibernateUtil {
     public Group addGroup(int number, String faculty) {
         EntityManager em = getEm();
         Group group = new Group(number, faculty);
-        em.getTransaction().begin();
         em.persist(group);
-        em.getTransaction().commit();
         em.close();
         return group;
     }
@@ -141,27 +134,21 @@ public class HibernateUtil {
     public Student addStudent(String firstname, String lastname, String secondname, Date dob, int group) {
         EntityManager em = getEm();
         Student student = new Student(firstname, lastname, secondname, dob, group);
-        em.getTransaction().begin();
         em.persist(student);
-        em.getTransaction().commit();
         em.close();
         return student;
     }
 
     public void removeGroup(Group group) {
         EntityManager em = getEm();
-        em.getTransaction().begin();
-        em.remove(group);
-        em.getTransaction().commit();
+        em.remove(em.contains(group) ? group : em.merge(group));
         em.close();
     }
 
 
     public void removeStudent(Student student) {
         EntityManager em = getEm();
-        em.getTransaction().begin();
-        em.remove(student);
-        em.getTransaction().commit();
+        em.remove(em.contains(student) ? student : em.merge(student));
         em.close();
     }
 
