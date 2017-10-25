@@ -1,25 +1,24 @@
 package com.haulmont.testtask.UI;
 
-import com.haulmont.testtask.DAO.Groups;
+import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidator;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.*;
-import javafx.print.Collation;
 
 import java.util.Collection;
 
 
-public class GroupsTable {
-    private static final Label EDIT_GROUPS_LABLE = new Label("Edit Groups");
-    private static final Label NUMER_LABLE = new Label("Number:");
-    private static final Label FACULTY_LABLE = new Label("Faculty:");
+public class GroupTable {
+    private static final Label EDIT_GROUPS_LABLE = new Label("Edit Group");
+    private static final Label NUMER_LABLE = new Label("Number: ");
+    private static final Label FACULTY_LABLE = new Label("Faculty: ");
     private static final VerticalLayout LAYOUT = new VerticalLayout();
 
     Grid grid;
-    BeanItemContainer<Groups> container;
+    BeanItemContainer<Group> container;
     TextField numberField;
     TextField facultyField;
     Button addItemButton;
@@ -27,7 +26,7 @@ public class GroupsTable {
     CustomIntegerRangeValidator customIntegerRangeValidator;
 
     public VerticalLayout table() {
-        container = new BeanItemContainer<>(Groups.class, MainUI.hibernateUtil.getGroups());
+        container = new BeanItemContainer<Group>(Group.class, MainUI.hibernateUtil.getGroup());
         grid = new Grid(container);
         grid.setColumnOrder("id", "number", "faculty");
         grid.setEditorEnabled(true);
@@ -38,7 +37,7 @@ public class GroupsTable {
 
             @Override
             public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
-                Groups group = (Groups) grid.getEditedItemId();
+                Group group = (Group) grid.getEditedItemId();
                 if (MainUI.hibernateUtil.updateGroup(group)) {
                     Notification.show("ok save");
                 } else {
@@ -48,20 +47,44 @@ public class GroupsTable {
         });
         grid.getColumn("id").setEditable(false);
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        addNumberField();
+        addFacultyField();
+        addItemButton = new Button("Add group");
+        addItemButton.addClickListener(this::addItemListener);
+        removeItemButton = new Button("Remove");
+        removeItemButton.addClickListener(this::removeItemListener);
+
+        LAYOUT.addComponents(EDIT_GROUPS_LABLE, grid, sortComponetsLayout());
+        return LAYOUT;
+    }
+
+    private HorizontalLayout sortComponetsLayout() {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        VerticalLayout verticalLayoutNumber = new VerticalLayout();
+        verticalLayoutNumber.addComponents(NUMER_LABLE, numberField);
+
+        VerticalLayout verticalLayoutFaculty = new VerticalLayout();
+        verticalLayoutFaculty.addComponents(FACULTY_LABLE, facultyField);
+
+        VerticalLayout verticalLayoutButton = new VerticalLayout();
+        verticalLayoutButton.addComponents(addItemButton, removeItemButton);
+        horizontalLayout.addComponents(verticalLayoutNumber, verticalLayoutFaculty, verticalLayoutButton);
+        return horizontalLayout;
+    }
+
+    private void addNumberField() {
         numberField = new TextField();
         numberField.setNullRepresentation("0");
         customIntegerRangeValidator = new CustomIntegerRangeValidator("Value must be a integer between 1 and 999999999", 1, 999999999);
         numberField.addValidator(customIntegerRangeValidator);
         numberField.setValidationVisible(false);
+    }
+
+    private void addFacultyField() {
         facultyField = new TextField();
         facultyField.setNullSettingAllowed(true);
         facultyField.addValidator(new StringLengthValidator("The faculty must have 2 - 200", 2, 200, true));
         facultyField.setValidationVisible(false);
-        addItemButton = new Button("Add group");
-        addItemButton.addClickListener(this::addItemListener);
-        setRemoveItemButton();
-        LAYOUT.addComponents(EDIT_GROUPS_LABLE, grid, NUMER_LABLE, numberField, FACULTY_LABLE, facultyField, addItemButton, removeItemButton);
-        return LAYOUT;
     }
 
     private void addItemListener(Button.ClickEvent clickEvent) {
@@ -70,26 +93,20 @@ public class GroupsTable {
             Notification.show("Error integer format!", Notification.Type.WARNING_MESSAGE);
         } else {
             String facultyString = facultyField.getValue();
-            Groups group = MainUI.hibernateUtil.addGroup(Integer.parseInt(numberString), facultyString);
+            Group group = MainUI.hibernateUtil.addGroup(Integer.parseInt(numberString), facultyString);
             numberField.clear();
             facultyField.clear();
             grid.getContainerDataSource().addItem(group);
         }
     }
 
-    private void setRemoveItemButton() {
-        removeItemButton = new Button("Remove");
-        removeItemButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                Collection<Object> selectedRows = grid.getSelectedRows();
-                selectedRows.remove(null);
-                for (Object item : selectedRows) {
-                    grid.getContainerDataSource().removeItem(item);
-                    MainUI.hibernateUtil.removeGroup((Groups) item);
-                }
-            }
-        });
+    private void removeItemListener(Button.ClickEvent clickEvent) {
+        Collection<Object> selectedRows = grid.getSelectedRows();
+        selectedRows.remove(null);
+        for (Object item : selectedRows) {
+            MainUI.hibernateUtil.removeGroup((Group) item);
+            grid.getContainerDataSource().removeItem(item);
+        }
     }
 
 }

@@ -3,10 +3,11 @@ package com.haulmont.testtask.DAO;
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity
-@Table(name = "students")
-public class Students {
+@Entity(name = "student")
+public class Student {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private int id;
     @Column(name = "firstname", nullable = true)
@@ -17,8 +18,21 @@ public class Students {
     private String secondname;
     @Column(name = "dob", nullable = true)
     private Date dob;
+//    @ManyToOne
+//    @JoinColumn(name = "group_id")
     @Column(name = "group_id", nullable = true)
     private int groupID;
+
+    public Student(String firstname, String lastname, String secondname, Date dob, int groupID) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.secondname = secondname;
+        this.dob = dob;
+        this.groupID = groupID;
+    }
+
+    public Student() {
+    }
 
     public int getId() {
         return id;
