@@ -3,22 +3,24 @@ package com.haulmont.testtask.UI;
 import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.DAO.Student;
 import com.haulmont.testtask.MainUI;
+import com.haulmont.testtask.UI.vaadin.customvalidator.CustomComboBox;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.data.validator.DateRangeValidator;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.*;
 import com.vaadin.ui.renderers.DateRenderer;
+import com.vaadin.ui.renderers.Renderer;
+import de.datenhahn.vaadin.componentrenderer.ComponentRenderer;
 import elemental.json.JsonValue;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 
 public class StudentTable {
@@ -37,13 +39,18 @@ public class StudentTable {
     TextField lastnameField;
     TextField secondnameField;
     DateField dobDateField;
-    ComboBox groupIDcomboBoxField;
-
+    CustomComboBox groupComboBoxField;
+    CustomComboBox groupComboBoxTableField;
     Button addItemButton;
     Button removeItemButton;
 
     public VerticalLayout table() {
         container = new BeanItemContainer<>(Student.class, MainUI.hibernateUtil.getStudent());
+        addGroupField();
+        addFirstNameField();
+        addSecondnameField();
+        addLastnameField();
+        addDOBField();
         grid = new Grid(container);
         grid.setColumnOrder("id", "firstname", "lastname", "secondname", "dob", "group");
         grid.setEditorEnabled(true);
@@ -56,9 +63,9 @@ public class StudentTable {
             public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
                 Student student = (Student) grid.getEditedItemId();
                 if (MainUI.hibernateUtil.updateStudent(student)) {
-                    Notification.show("ok save");
+                    Notification.show("ok save", Notification.Type.TRAY_NOTIFICATION);
                 } else {
-                    Notification.show("error save");
+                    Notification.show("Error save!", Notification.Type.WARNING_MESSAGE);
                 }
             }
         });
@@ -70,12 +77,9 @@ public class StudentTable {
                 else return super.encode(value);
             }
         });
-        grid.setSelectionMode(Grid.SelectionMode.MULTI);
-        addFirstNameField();
-        addSecondnameField();
-        addLastnameField();
-        addDOBField();
-        addGroupField();
+//grid.getColumn("dob").setEditorField()
+        grid.getColumn("group").setEditorField(groupComboBoxTableField);
+//        grid.setCellStyleGenerator(cell -> );
         addItemButton = new Button("Add student");
         addItemButton.addClickListener(this::addItemListener);
         removeItemButton = new Button("Remove student");
@@ -84,7 +88,9 @@ public class StudentTable {
         LAYOUT.addComponents(EDIT_STUDENT_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
     }
-
+    public static Integer getClassField(Group group){
+        return group.getId();
+    }
     private HorizontalLayout sortComponetsLayout() {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         VerticalLayout verticalLayoutFullName = new VerticalLayout();
@@ -93,7 +99,7 @@ public class StudentTable {
                 SECONDNAME_LABLE, secondnameField);
 
         VerticalLayout verticalLayoutEquipment = new VerticalLayout();
-        verticalLayoutEquipment.addComponents(DOB_LABLE, dobDateField, GROUP_ID_LABLE, groupIDcomboBoxField);
+        verticalLayoutEquipment.addComponents(DOB_LABLE, dobDateField, GROUP_ID_LABLE, groupComboBoxField);
 
         VerticalLayout verticalLayoutButton = new VerticalLayout();
         verticalLayoutButton.addComponents(addItemButton, removeItemButton);
@@ -138,22 +144,27 @@ public class StudentTable {
     }
 
     private void addGroupField() {
-        groupIDcomboBoxField = new ComboBox("Selected Group: ");
-        groupIDcomboBoxField.setNullSelectionAllowed(false);
-        groupIDcomboBoxField.setFilteringMode(FilteringMode.CONTAINS);
-        groupIDcomboBoxField.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
-        groupIDcomboBoxField.setContainerDataSource(GroupTable.container);
-        groupIDcomboBoxField.setItemCaptionPropertyId("number");
-        groupIDcomboBoxField.setValidationVisible(false);
-    }
+        groupComboBoxField = new CustomComboBox("Selected Group: ");
+        groupComboBoxField.setNullSelectionAllowed(false);
+        groupComboBoxField.setFilteringMode(FilteringMode.CONTAINS);
+        groupComboBoxField.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
+        groupComboBoxField.setContainerDataSource(GroupTable.container);
+        groupComboBoxField.setItemCaptionPropertyId("number");
+        groupComboBoxField.setValidationVisible(false);
+        try {
+            groupComboBoxTableField = (CustomComboBox) groupComboBoxField.clone();
+        } catch (CloneNotSupportedException e) {
+            Notification.show("Error ComboBox!", Notification.Type.WARNING_MESSAGE);
+        }
 
+    }
 
     private void addItemListener(Button.ClickEvent clickEvent) {
         String firstnameString = firstnameField.getValue();
         String lastnameString = lastnameField.getValue();
         String secondnameString = secondnameField.getValue();
         Date dobDate = dobDateField.getValue();
-        Group group = (Group) groupIDcomboBoxField.getValue();
+        Group group = (Group) groupComboBoxField.getValue();
 
         Student student = MainUI.hibernateUtil.addStudent(firstnameString, lastnameString, secondnameString, dobDate, group);
         firstnameField.clear();

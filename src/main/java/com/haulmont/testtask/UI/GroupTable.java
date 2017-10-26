@@ -39,9 +39,9 @@ public class GroupTable {
             public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
                 Group group = (Group) grid.getEditedItemId();
                 if (MainUI.hibernateUtil.updateGroup(group)) {
-                    Notification.show("ok save");
+                    Notification.show("Ok save", Notification.Type.TRAY_NOTIFICATION);
                 } else {
-                    Notification.show("error save");
+                    Notification.show("Error save!", Notification.Type.WARNING_MESSAGE);
                 }
             }
         });
