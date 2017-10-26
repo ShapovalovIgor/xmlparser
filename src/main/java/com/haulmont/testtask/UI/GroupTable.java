@@ -18,7 +18,7 @@ public class GroupTable {
     private static final VerticalLayout LAYOUT = new VerticalLayout();
 
     Grid grid;
-    BeanItemContainer<Group> container;
+    protected static BeanItemContainer<Group> container;
     TextField numberField;
     TextField facultyField;
     Button addItemButton;
@@ -104,8 +104,13 @@ public class GroupTable {
         Collection<Object> selectedRows = grid.getSelectedRows();
         selectedRows.remove(null);
         for (Object item : selectedRows) {
-            MainUI.hibernateUtil.removeGroup((Group) item);
-            grid.getContainerDataSource().removeItem(item);
+            if(MainUI.hibernateUtil.removeGroup((Group) item)){
+                grid.getContainerDataSource().removeItem(item);
+                Notification.show("Ok, remove group", Notification.Type.TRAY_NOTIFICATION);
+            }else {
+                Notification.show("Group have student! Is not remove Group.", Notification.Type.WARNING_MESSAGE);
+            }
+
         }
     }
 

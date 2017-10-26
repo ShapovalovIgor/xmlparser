@@ -18,27 +18,26 @@ public class Student {
     private String secondname;
     @Column(name = "dob", nullable = true)
     private Date dob;
-//    @ManyToOne
-//    @JoinColumn(name = "group_id")
-    @Column(name = "group_id", nullable = true)
-    private int groupID;
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
 
-    public Student(String firstname, String lastname, String secondname, Date dob, int groupID) {
+    public Student(String firstname, String lastname, String secondname, Date dob, Group group) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.secondname = secondname;
         this.dob = dob;
-        this.groupID = groupID;
+        this.group = group;
     }
 
     public Student() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -74,12 +73,13 @@ public class Student {
         this.dob = dob;
     }
 
-    public int getGroupID() {
-        return groupID;
+
+    public Group getGroup() {
+        return this.group;
     }
 
-    public void setGroupID(int id) {
-        this.groupID = groupID;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
 }

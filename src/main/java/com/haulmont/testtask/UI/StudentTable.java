@@ -45,7 +45,7 @@ public class StudentTable {
     public VerticalLayout table() {
         container = new BeanItemContainer<>(Student.class, MainUI.hibernateUtil.getStudent());
         grid = new Grid(container);
-        grid.setColumnOrder("id", "firstname", "lastname", "secondname", "dob", "groupID");
+        grid.setColumnOrder("id", "firstname", "lastname", "secondname", "dob", "group");
         grid.setEditorEnabled(true);
         grid.getEditorFieldGroup().addCommitHandler(new FieldGroup.CommitHandler() {
             @Override
@@ -141,8 +141,9 @@ public class StudentTable {
         groupIDcomboBoxField = new ComboBox("Selected Group: ");
         groupIDcomboBoxField.setNullSelectionAllowed(false);
         groupIDcomboBoxField.setFilteringMode(FilteringMode.CONTAINS);
-        groupIDcomboBoxField.addItems(getRefGroups());
-//        groupIDcomboBoxField.setItemCaptionPropertyId("number");
+        groupIDcomboBoxField.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
+        groupIDcomboBoxField.setContainerDataSource(GroupTable.container);
+        groupIDcomboBoxField.setItemCaptionPropertyId("number");
         groupIDcomboBoxField.setValidationVisible(false);
     }
 
@@ -152,8 +153,9 @@ public class StudentTable {
         String lastnameString = lastnameField.getValue();
         String secondnameString = secondnameField.getValue();
         Date dobDate = dobDateField.getValue();
-        Integer groupIdInteger = ((RefGroup) groupIDcomboBoxField.getValue()).getId();
-        Student student = MainUI.hibernateUtil.addStudent(firstnameString, lastnameString, secondnameString, dobDate, groupIdInteger);
+        Group group = (Group) groupIDcomboBoxField.getValue();
+
+        Student student = MainUI.hibernateUtil.addStudent(firstnameString, lastnameString, secondnameString, dobDate, group);
         firstnameField.clear();
         secondnameField.clear();
         grid.getContainerDataSource().addItem(student);
@@ -166,42 +168,6 @@ public class StudentTable {
         for (Object item : selectedRows) {
             MainUI.hibernateUtil.removeStudent((Student) item);
             grid.getContainerDataSource().removeItem(item);
-        }
-    }
-
-    private List<RefGroup> getRefGroups() {
-        List<RefGroup> refGroupList = new ArrayList<>();
-        List<Group> groupList = MainUI.hibernateUtil.getGroup();
-        for (Group group : groupList)
-            refGroupList.add(new RefGroup(group.getId(), group.getNumber()));
-        return refGroupList;
-    }
-
-    public final class RefGroup {
-
-        private Integer id;
-        private int number;
-
-        public RefGroup(Integer id, int number) {
-            super();
-            this.id = id;
-            this.number = number;
-        }
-
-        public Integer getId() {
-            return id;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
-        public void setId(Integer id) {
-            this.id = id;
-        }
-
-        public void setNumber(int number) {
-            this.number = number;
         }
     }
 

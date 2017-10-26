@@ -3,6 +3,7 @@ package com.haulmont.testtask.database;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -19,6 +20,7 @@ import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -90,6 +92,7 @@ public class HibernateUtil {
         return groupList;
     }
 
+
     public List<Student> getStudent() {
         EntityManager em = getEm();
         CriteriaQuery cq = em.getCriteriaBuilder().createQuery(Student.class);
@@ -101,14 +104,18 @@ public class HibernateUtil {
 
     public boolean updateGroup(Group group) {
         EntityManager em = getEm();
+        em.getTransaction().begin();
         em.merge(group);
+        em.getTransaction().commit();
         em.close();
         return true;
     }
 
     public boolean updateStudent(Student student) {
         EntityManager em = getEm();
+        em.getTransaction().begin();
         em.merge(student);
+        em.getTransaction().commit();
         em.close();
         return true;
     }
@@ -118,7 +125,9 @@ public class HibernateUtil {
         Group group = new Group();
         group.setNumber(000000);
         group.setFaculty("Delhi - India");
+        em.getTransaction().begin();
         em.persist(group);
+        em.getTransaction().commit();
         em.close();
     }
 
@@ -126,29 +135,45 @@ public class HibernateUtil {
     public Group addGroup(int number, String faculty) {
         EntityManager em = getEm();
         Group group = new Group(number, faculty);
+        em.getTransaction().begin();
         em.persist(group);
+        em.getTransaction().commit();
         em.close();
         return group;
     }
 
-    public Student addStudent(String firstname, String lastname, String secondname, Date dob, int group) {
+    public Student addStudent(String firstname, String lastname, String secondname, Date dob, Group group) {
         EntityManager em = getEm();
+        em.getTransaction().begin();
         Student student = new Student(firstname, lastname, secondname, dob, group);
         em.persist(student);
+        em.getTransaction().commit();
         em.close();
         return student;
     }
 
-    public void removeGroup(Group group) {
+    public boolean removeGroup(Group group) {
         EntityManager em = getEm();
-        em.remove(em.contains(group) ? group : em.merge(group));
-        em.close();
+        List<Student> student = (ArrayList)
+                em.createQuery("SELECT n FROM student n WHERE n.group = ?1").setParameter(1, group).getResultList();
+        if (!student.isEmpty()) {
+            em.getTransaction().begin();
+            em.remove(em.contains(group) ? group : em.merge(group));
+            em.close();
+            return true;
+        } else {
+            em.close();
+            return false;
+        }
+
     }
 
 
     public void removeStudent(Student student) {
         EntityManager em = getEm();
+        em.getTransaction().begin();
         em.remove(em.contains(student) ? student : em.merge(student));
+        em.getTransaction().commit();
         em.close();
     }
 
@@ -156,6 +181,7 @@ public class HibernateUtil {
         try {
             executeSQLCommand("drop table student;");
             executeSQLCommand("drop table student_group;");
+
 
             executeSQLCommandInFile(Constant.CREATE_TABLE_SCRIPT);
             executeSQLCommandInFile(Constant.DATA_SCRIPT);
