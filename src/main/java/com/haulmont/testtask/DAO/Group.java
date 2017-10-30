@@ -3,7 +3,7 @@ package com.haulmont.testtask.DAO;
 import javax.persistence.*;
 
 @Entity(name = "student_group")
-public class Group implements EditObject {
+public class Group implements GroupImpl {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -25,10 +25,6 @@ public class Group implements EditObject {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getNumber() {

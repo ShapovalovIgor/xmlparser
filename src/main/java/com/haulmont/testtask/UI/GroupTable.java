@@ -1,6 +1,7 @@
 package com.haulmont.testtask.UI;
 
 import com.haulmont.testtask.DAO.Group;
+import com.haulmont.testtask.DAO.GroupImpl;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidator;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -22,17 +23,18 @@ public class GroupTable {
     private static final Label FACULTY_LABLE = new Label("Faculty: ");
     private static final VerticalLayout LAYOUT = new VerticalLayout();
 
-    Grid grid;
-    protected static BeanItemContainer<Group> container;
-    TextField numberField;
-    TextField facultyField;
-    Button createGroupButton;
-    Button addItemButton;
-    Button removeItemButton;
-    CustomIntegerRangeValidator customIntegerRangeValidator;
+    private Grid grid;
+    protected static BeanItemContainer<GroupImpl> container;
+    private TextField numberField;
+    private TextField facultyField;
+    private Button createGroupButton;
+    private Button addItemButton;
+    private Button removeItemButton;
+    private CustomIntegerRangeValidator customIntegerRangeValidator;
+    private Window modalWindow;
 
     public VerticalLayout table() {
-        container = new BeanItemContainer<Group>(Group.class, MainUI.hibernateUtil.getGroup());
+        container = new BeanItemContainer<GroupImpl>(GroupImpl.class, MainUI.hibernateUtil.getGroup());
         grid = new Grid(container);
         grid.setColumnOrder("id", "number", "faculty");
         grid.setEditorEnabled(true);
@@ -66,10 +68,11 @@ public class GroupTable {
         return LAYOUT;
     }
 
-    private HorizontalLayout sortComponetsLayout() {
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponents(createGroupButton, removeItemButton);
-        return horizontalLayout;
+    private Button addItemButton() {
+        addItemButton = new Button("Add group");
+        addItemButton.setStyleName("friendly");
+        addItemButton.addClickListener(this::addItemListener);
+        return addItemButton;
     }
 
     private void addAddItemButton() {
@@ -79,19 +82,18 @@ public class GroupTable {
 
     }
 
+    private HorizontalLayout sortComponetsLayout() {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.addComponents(createGroupButton, removeItemButton);
+        return horizontalLayout;
+    }
+
     private void addNumberField() {
         numberField = new TextField();
         numberField.setNullRepresentation("0");
         customIntegerRangeValidator = new CustomIntegerRangeValidator("Value must be a integer between 1 and 999999999", 1, 999999999);
         numberField.addValidator(customIntegerRangeValidator);
         numberField.setValidationVisible(false);
-    }
-
-    private Button addItemButton() {
-        addItemButton = new Button("Add group");
-        addItemButton.setStyleName("friendly");
-        addItemButton.addClickListener(this::addItemListener);
-        return addItemButton;
     }
 
     private void addFacultyField() {
@@ -112,6 +114,7 @@ public class GroupTable {
             facultyField.clear();
             grid.getContainerDataSource().addItem(group);
         }
+        modalWindow.close();
     }
 
     private void removeItemListener(Button.ClickEvent clickEvent) {
@@ -143,7 +146,7 @@ public class GroupTable {
         cancel.setStyleName("danger");
         buttons.addComponent(cancel);
         rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
-        Window modalWindow = new Window("New Group", rootWindowsVerticalLayout);
+        modalWindow = new Window("New Group", rootWindowsVerticalLayout);
         cancel.addClickListener(e -> {
             modalWindow.close();
         });

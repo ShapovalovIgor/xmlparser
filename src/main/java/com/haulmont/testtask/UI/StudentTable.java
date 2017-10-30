@@ -2,6 +2,7 @@ package com.haulmont.testtask.UI;
 
 import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.DAO.Student;
+import com.haulmont.testtask.DAO.StudentImpl;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customfield.CustomComboBox;
 import com.haulmont.testtask.UI.vaadin.customfield.CustomPopupDateField;
@@ -10,7 +11,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.converters.DesignObjectConverter;
 import com.vaadin.ui.renderers.DateRenderer;
@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
+import static com.haulmont.testtask.MainUI.ui;
+
 
 public class StudentTable {
     private static final Label EDIT_STUDENT_LABLE = new Label("Edit Student");
@@ -29,24 +31,26 @@ public class StudentTable {
     private static final Label LASTNAME_LABLE = new Label("Lastname: ");
     private static final Label SECONDNAME_LABLE = new Label("Secondname: ");
     private static final Label DOB_LABLE = new Label("Date of birthday: ");
-    private static final Label GROUP_ID_LABLE = new Label("Group: ");
+    private static final Label GROUP_LABLE = new Label("Group: ");
 
     private static final VerticalLayout LAYOUT = new VerticalLayout();
 
-    Grid grid;
-    BeanItemContainer<Student> container;
-    TextField firstnameField;
-    TextField lastnameField;
-    TextField secondnameField;
-    CustomPopupDateField dobDateField;
-    CustomPopupDateField dobDateTableField;
-    CustomComboBox groupComboBoxField;
-    CustomComboBox groupComboBoxTableField;
-    Button addItemButton;
-    Button removeItemButton;
+    private Grid grid;
+    private BeanItemContainer<StudentImpl> container;
+    private TextField firstnameField;
+    private TextField lastnameField;
+    private TextField secondnameField;
+    private CustomPopupDateField dobDateField;
+    private CustomPopupDateField dobDateTableField;
+    private CustomComboBox groupComboBoxField;
+    private CustomComboBox groupComboBoxTableField;
+    private Button addItemButton;
+    private Button removeItemButton;
+    private Button createStudentButton;
+    private Window modalWindow;
 
     public VerticalLayout table() {
-        container = new BeanItemContainer<>(Student.class, MainUI.hibernateUtil.getStudent());
+        container = new BeanItemContainer<StudentImpl>(StudentImpl.class, MainUI.hibernateUtil.getStudent());
         addGroupField();
         addFirstNameField();
         addSecondnameField();
@@ -95,35 +99,33 @@ public class StudentTable {
         });
         grid.getColumn("dob").setEditorField(dobDateTableField);
         grid.getColumn("group").setEditorField(groupComboBoxTableField);
-        addItemButton = new Button("Add student");
-        addItemButton.setStyleName("friendly");
-        addItemButton.addClickListener(this::addItemListener);
         removeItemButton = new Button("Remove student");
         removeItemButton.setStyleName("danger");
         removeItemButton.addClickListener(this::removeItemListener);
+        addAddItemButton();
         grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
         grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
         LAYOUT.addComponents(EDIT_STUDENT_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
     }
 
-    public static Integer getClassField(Group group) {
-        return group.getId();
+    private Button addItemButton() {
+        addItemButton = new Button("Add student");
+        addItemButton.setStyleName("friendly");
+        addItemButton.addClickListener(this::addItemListener);
+        return addItemButton;
+    }
+
+    private void addAddItemButton() {
+        createStudentButton = new Button("Add student");
+        createStudentButton.addClickListener(this::openWindowsCreateGroup);
+        createStudentButton.setStyleName("friendly");
+
     }
 
     private HorizontalLayout sortComponetsLayout() {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        VerticalLayout verticalLayoutFullName = new VerticalLayout();
-        verticalLayoutFullName.addComponents(FIRSTNAME_LABLE, firstnameField,
-                LASTNAME_LABLE, lastnameField,
-                SECONDNAME_LABLE, secondnameField);
-
-        VerticalLayout verticalLayoutEquipment = new VerticalLayout();
-        verticalLayoutEquipment.addComponents(DOB_LABLE, dobDateField, GROUP_ID_LABLE, groupComboBoxField);
-
-        VerticalLayout verticalLayoutButton = new VerticalLayout();
-        verticalLayoutButton.addComponents(addItemButton, removeItemButton);
-        horizontalLayout.addComponents(verticalLayoutFullName, verticalLayoutEquipment, verticalLayoutButton);
+        horizontalLayout.addComponents(createStudentButton, removeItemButton);
         return horizontalLayout;
     }
 
@@ -203,7 +205,7 @@ public class StudentTable {
         firstnameField.clear();
         secondnameField.clear();
         grid.getContainerDataSource().addItem(student);
-
+        modalWindow.close();
     }
 
     private void removeItemListener(Button.ClickEvent clickEvent) {
@@ -215,4 +217,37 @@ public class StudentTable {
         }
     }
 
+    private void openWindowsCreateGroup(Button.ClickEvent clickEvent) {
+        VerticalLayout rootWindowsVerticalLayout = new VerticalLayout();
+        HorizontalLayout fieldLayout = new HorizontalLayout();
+        VerticalLayout verticalLayoutFirstname = new VerticalLayout();
+        verticalLayoutFirstname.addComponents(FIRSTNAME_LABLE, firstnameField);
+        VerticalLayout verticalLayoutLastname = new VerticalLayout();
+        verticalLayoutLastname.addComponents(LASTNAME_LABLE, lastnameField);
+        VerticalLayout verticalLayoutSecondname = new VerticalLayout();
+        verticalLayoutSecondname.addComponents(SECONDNAME_LABLE, secondnameField);
+        VerticalLayout verticalLayoutDOB = new VerticalLayout();
+        verticalLayoutDOB.addComponents(DOB_LABLE, dobDateField);
+        VerticalLayout verticalLayoutGroup = new VerticalLayout();
+        verticalLayoutGroup.addComponents(GROUP_LABLE, groupComboBoxField);
+        fieldLayout.addComponents(verticalLayoutFirstname,
+                verticalLayoutLastname, verticalLayoutSecondname, verticalLayoutDOB, verticalLayoutGroup);
+        HorizontalLayout buttons = new HorizontalLayout();
+
+        buttons.addComponent(addItemButton());
+        Button cancel = new Button("Cancel");
+        cancel.setStyleName("danger");
+        buttons.addComponent(cancel);
+        rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
+        modalWindow = new Window("New Student", rootWindowsVerticalLayout);
+        cancel.addClickListener(e -> {
+            modalWindow.close();
+        });
+        modalWindow.setModal(true);
+        modalWindow.setResizable(false);
+        modalWindow.setSizeUndefined();
+        modalWindow.getContent().setSizeUndefined();
+        modalWindow.center();
+        ui.addWindow(modalWindow);
+    }
 }
