@@ -4,6 +4,7 @@ import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.DAO.Student;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customvalidator.CustomComboBox;
+import com.haulmont.testtask.UI.vaadin.customvalidator.CustomDateField;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.Converter;
@@ -38,7 +39,8 @@ public class StudentTable {
     TextField firstnameField;
     TextField lastnameField;
     TextField secondnameField;
-    DateField dobDateField;
+    CustomDateField dobDateField;
+    CustomDateField dobDateTableField;
     CustomComboBox groupComboBoxField;
     CustomComboBox groupComboBoxTableField;
     Button addItemButton;
@@ -88,9 +90,11 @@ public class StudentTable {
         LAYOUT.addComponents(EDIT_STUDENT_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
     }
-    public static Integer getClassField(Group group){
+
+    public static Integer getClassField(Group group) {
         return group.getId();
     }
+
     private HorizontalLayout sortComponetsLayout() {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         VerticalLayout verticalLayoutFullName = new VerticalLayout();
@@ -129,7 +133,7 @@ public class StudentTable {
     }
 
     private void addDOBField() {
-        dobDateField = new DateField();
+        dobDateField = new CustomDateField("Select date: ");
         LocalDate localDate = LocalDate.now();
         LocalDate minLocalDate = localDate.minusYears(70);
         LocalDate maxLocalDate = localDate.minusYears(14);
@@ -141,10 +145,16 @@ public class StudentTable {
                 " - "
                 + maxLocalDate.toString(), minDate, maxDate, Resolution.DAY));
         dobDateField.setValidationVisible(false);
+        try {
+
+            dobDateTableField = (CustomDateField) dobDateField.clone();
+        } catch (CloneNotSupportedException e) {
+            Notification.show("Error Date Field!", Notification.Type.WARNING_MESSAGE);
+        }
     }
 
     private void addGroupField() {
-        groupComboBoxField = new CustomComboBox("Selected Group: ");
+        groupComboBoxField = new CustomComboBox("Selected group: ");
         groupComboBoxField.setNullSelectionAllowed(false);
         groupComboBoxField.setFilteringMode(FilteringMode.CONTAINS);
         groupComboBoxField.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);
