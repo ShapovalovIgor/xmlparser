@@ -151,7 +151,6 @@ public class StudentTable {
     private void addDOBField() {
         dobDateField = new CustomPopupDateField();
         dobDateField.setInputPrompt("Select a date");
-        dobDateField.setStyleName("primary");
         dobDateField.validate();
         dobDateField.setStyleName("{background: blue;}");
         dobDateField.setDateFormat("yyyy-MM-dd");
