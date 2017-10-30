@@ -4,14 +4,15 @@ import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.DAO.Student;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customfield.CustomComboBox;
-import com.haulmont.testtask.UI.vaadin.customfield.CustomDateField;
+import com.haulmont.testtask.UI.vaadin.customfield.CustomPopupDateField;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.validator.DateRangeValidator;
 import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.declarative.converters.DesignObjectConverter;
 import com.vaadin.ui.renderers.DateRenderer;
 import elemental.json.JsonValue;
 
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class StudentTable {
@@ -36,8 +38,8 @@ public class StudentTable {
     TextField firstnameField;
     TextField lastnameField;
     TextField secondnameField;
-    CustomDateField dobDateField;
-    CustomDateField dobDateTableField;
+    CustomPopupDateField dobDateField;
+    CustomPopupDateField dobDateTableField;
     CustomComboBox groupComboBoxField;
     CustomComboBox groupComboBoxTableField;
     Button addItemButton;
@@ -51,8 +53,22 @@ public class StudentTable {
         addLastnameField();
         addDOBField();
         grid = new Grid(container);
+//        container
         grid.setColumnOrder("id", "firstname", "lastname", "secondname", "dob", "group");
+        grid.getColumn("group").setConverter(new DesignObjectConverter() {
+            @Override
+            public String convertToPresentation(Object value,
+                                                Class<? extends String> targetType, Locale locale)
+                    throws com.vaadin.data.util.converter.Converter.ConversionException {
+                if (value == null) {
+                    return null;
+                }
+
+                return String.valueOf(((Group) value).getId());
+            }
+        });
         grid.setEditorEnabled(true);
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.getEditorFieldGroup().addCommitHandler(new FieldGroup.CommitHandler() {
             @Override
             public void preCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
@@ -69,21 +85,24 @@ public class StudentTable {
             }
         });
         grid.getColumn("id").setEditable(false);
-        grid.getColumn("dob").setRenderer(new DateRenderer("%1$tY-%1$tm-1$te") {
+
+        grid.getColumn("dob").setRenderer(new DateRenderer("%1$tY-%1$tm-%1$te") {
             @Override
             public JsonValue encode(Date value) {
                 if (value == null) return encode("", String.class);
                 else return super.encode(value);
             }
         });
-//grid.getColumn("dob").setEditorField()
+        grid.getColumn("dob").setEditorField(dobDateTableField);
         grid.getColumn("group").setEditorField(groupComboBoxTableField);
-//        grid.setCellStyleGenerator(cell -> );
         addItemButton = new Button("Add student");
+        addItemButton.setStyleName("friendly");
         addItemButton.addClickListener(this::addItemListener);
         removeItemButton = new Button("Remove student");
+        removeItemButton.setStyleName("danger");
         removeItemButton.addClickListener(this::removeItemListener);
-
+        grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
         LAYOUT.addComponents(EDIT_STUDENT_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
     }
@@ -130,21 +149,29 @@ public class StudentTable {
     }
 
     private void addDOBField() {
-        dobDateField = new CustomDateField("Select date: ");
+        dobDateField = new CustomPopupDateField();
+        dobDateField.setInputPrompt("Select a date");
+        dobDateField.setStyleName("primary");
+        dobDateField.validate();
+        dobDateField.setStyleName("{background: blue;}");
+        dobDateField.setDateFormat("yyyy-MM-dd");
         LocalDate localDate = LocalDate.now();
         LocalDate minLocalDate = localDate.minusYears(70);
         LocalDate maxLocalDate = localDate.minusYears(14);
         Date minDate = Date.from(minLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date maxDate = Date.from(maxLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        dobDateField.addValidator(new DateRangeValidator("The date of birthday must have "
+        dobDateField.setRangeStart(minDate);
+        dobDateField.setRangeEnd(maxDate);
+        dobDateField.setDateOutOfRangeMessage("The date of birthday must have "
                 + minLocalDate.toString() +
                 " - "
-                + maxLocalDate.toString(), minDate, maxDate, Resolution.DAY));
+                + maxLocalDate.toString());
+        dobDateField.setTextFieldEnabled(false);
         dobDateField.setValidationVisible(false);
+
         try {
 
-            dobDateTableField = (CustomDateField) dobDateField.clone();
+            dobDateTableField = (CustomPopupDateField) dobDateField.clone();
         } catch (CloneNotSupportedException e) {
             Notification.show("Error Date Field!", Notification.Type.WARNING_MESSAGE);
         }

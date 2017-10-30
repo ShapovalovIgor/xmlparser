@@ -6,6 +6,7 @@ import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidat
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 
 import java.util.Collection;
@@ -50,10 +51,14 @@ public class GroupTable {
         addNumberField();
         addFacultyField();
         addItemButton = new Button("Add group");
+        addItemButton.setStyleName("friendly");
         addItemButton.addClickListener(this::addItemListener);
         removeItemButton = new Button("Remove");
-        removeItemButton.addClickListener(this::removeItemListener);
+        removeItemButton.setStyleName("danger");
 
+        removeItemButton.addClickListener(this::removeItemListener);
+        grid.setWidth( 100, Sizeable.Unit.PERCENTAGE );
+        grid.setHeight( 100, Sizeable.Unit.PERCENTAGE );
         LAYOUT.addComponents(EDIT_GROUPS_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
     }
