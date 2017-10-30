@@ -14,7 +14,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @Theme("vaadinbutton")
 public class MainUI extends UI {
     public static HibernateUtil hibernateUtil = null;
-
+public static UI ui;
     @Override
     protected void init(VaadinRequest request) {
         hibernateUtil = new HibernateUtil();
@@ -46,6 +46,7 @@ public class MainUI extends UI {
         tabs.setSizeFull(); // Make the TabSheet fill all available space. By default the height is fixed.
         tabs.addTab( groupsTab, "Group" );
         tabs.addTab( studentsTab, "Student" );
+        ui = this;
         this.setContent( tabs );
     }
 }

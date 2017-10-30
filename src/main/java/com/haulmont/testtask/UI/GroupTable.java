@@ -6,10 +6,14 @@ import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidat
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 
 import java.util.Collection;
+
+import static com.haulmont.testtask.MainUI.ui;
+import static java.awt.SystemColor.window;
 
 
 public class GroupTable {
@@ -22,6 +26,7 @@ public class GroupTable {
     protected static BeanItemContainer<Group> container;
     TextField numberField;
     TextField facultyField;
+    Button createGroupButton;
     Button addItemButton;
     Button removeItemButton;
     CustomIntegerRangeValidator customIntegerRangeValidator;
@@ -50,31 +55,28 @@ public class GroupTable {
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         addNumberField();
         addFacultyField();
-        addItemButton = new Button("Add group");
-        addItemButton.setStyleName("friendly");
-        addItemButton.addClickListener(this::addItemListener);
+        addAddItemButton();
         removeItemButton = new Button("Remove");
         removeItemButton.setStyleName("danger");
 
         removeItemButton.addClickListener(this::removeItemListener);
-        grid.setWidth( 100, Sizeable.Unit.PERCENTAGE );
-        grid.setHeight( 100, Sizeable.Unit.PERCENTAGE );
+        grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
         LAYOUT.addComponents(EDIT_GROUPS_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
     }
 
     private HorizontalLayout sortComponetsLayout() {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        VerticalLayout verticalLayoutNumber = new VerticalLayout();
-        verticalLayoutNumber.addComponents(NUMER_LABLE, numberField);
-
-        VerticalLayout verticalLayoutFaculty = new VerticalLayout();
-        verticalLayoutFaculty.addComponents(FACULTY_LABLE, facultyField);
-
-        VerticalLayout verticalLayoutButton = new VerticalLayout();
-        verticalLayoutButton.addComponents(addItemButton, removeItemButton);
-        horizontalLayout.addComponents(verticalLayoutNumber, verticalLayoutFaculty, verticalLayoutButton);
+        horizontalLayout.addComponents(createGroupButton, removeItemButton);
         return horizontalLayout;
+    }
+
+    private void addAddItemButton() {
+        createGroupButton = new Button("Add group");
+        createGroupButton.addClickListener(this::openWindowsCreateGroup);
+        createGroupButton.setStyleName("friendly");
+
     }
 
     private void addNumberField() {
@@ -83,6 +85,13 @@ public class GroupTable {
         customIntegerRangeValidator = new CustomIntegerRangeValidator("Value must be a integer between 1 and 999999999", 1, 999999999);
         numberField.addValidator(customIntegerRangeValidator);
         numberField.setValidationVisible(false);
+    }
+
+    private Button addItemButton() {
+        addItemButton = new Button("Add group");
+        addItemButton.setStyleName("friendly");
+        addItemButton.addClickListener(this::addItemListener);
+        return addItemButton;
     }
 
     private void addFacultyField() {
@@ -109,14 +118,41 @@ public class GroupTable {
         Collection<Object> selectedRows = grid.getSelectedRows();
         selectedRows.remove(null);
         for (Object item : selectedRows) {
-            if(MainUI.hibernateUtil.removeGroup((Group) item)){
+            if (MainUI.hibernateUtil.removeGroup((Group) item)) {
                 grid.getContainerDataSource().removeItem(item);
                 Notification.show("Ok, remove group", Notification.Type.TRAY_NOTIFICATION);
-            }else {
+            } else {
                 Notification.show("Group have student! Is not remove Group.", Notification.Type.WARNING_MESSAGE);
             }
 
         }
     }
 
+    private void openWindowsCreateGroup(Button.ClickEvent clickEvent) {
+        VerticalLayout rootWindowsVerticalLayout = new VerticalLayout();
+        HorizontalLayout fieldLayout = new HorizontalLayout();
+        VerticalLayout verticalLayoutNumber = new VerticalLayout();
+        verticalLayoutNumber.addComponents(NUMER_LABLE, numberField);
+        VerticalLayout verticalLayoutFaculty = new VerticalLayout();
+        verticalLayoutFaculty.addComponents(FACULTY_LABLE, facultyField);
+        fieldLayout.addComponents(verticalLayoutNumber, verticalLayoutFaculty);
+        HorizontalLayout buttons = new HorizontalLayout();
+
+        buttons.addComponent(addItemButton());
+        Button cancel = new Button("Cancel");
+        cancel.setStyleName("danger");
+        buttons.addComponent(cancel);
+        rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
+        Window modalWindow = new Window("New Group", rootWindowsVerticalLayout);
+        cancel.addClickListener(e -> {
+            modalWindow.close();
+        });
+        modalWindow.setModal(true);
+        modalWindow.setResizable(false);
+        modalWindow.setSizeUndefined();
+        modalWindow.getContent().setSizeUndefined();
+        modalWindow.center();
+        ui.addWindow(modalWindow);
+
+    }
 }
