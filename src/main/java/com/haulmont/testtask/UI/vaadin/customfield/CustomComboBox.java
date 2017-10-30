@@ -1,4 +1,4 @@
-package com.haulmont.testtask.UI.vaadin.customvalidator;
+package com.haulmont.testtask.UI.vaadin.customfield;
 
 import com.vaadin.ui.ComboBox;
 
