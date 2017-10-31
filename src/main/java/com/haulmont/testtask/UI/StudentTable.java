@@ -27,7 +27,7 @@ import static com.haulmont.testtask.MainUI.ui;
 
 public class StudentTable {
     private static final Label EDIT_STUDENT_LABLE = new Label("Edit Student");
-    private static final Label FIRSTNAME_LABLE = new Label("FirstName: ");
+    private static final Label FIRSTNAME_LABLE = new Label("Firstname: ");
     private static final Label LASTNAME_LABLE = new Label("Lastname: ");
     private static final Label SECONDNAME_LABLE = new Label("Secondname: ");
     private static final Label DOB_LABLE = new Label("Date of birthday: ");
