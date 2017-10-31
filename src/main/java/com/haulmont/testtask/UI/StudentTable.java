@@ -121,7 +121,7 @@ public class StudentTable extends UIHelper {
 
     private void addFirstNameField(Student student) {
         firstnameField = new TextField();
-        if (student != null) {
+        if (null != student) {
             firstnameField.setValue(student.getFirstname());
         }
         firstnameField.setNullSettingAllowed(true);
@@ -138,7 +138,7 @@ public class StudentTable extends UIHelper {
 
     private void addSecondnameField(Student student) {
         secondnameField = new TextField();
-        if (student != null) {
+        if (null != student) {
             secondnameField.setValue(student.getSecondname());
         }
         secondnameField.setNullSettingAllowed(true);
@@ -155,7 +155,7 @@ public class StudentTable extends UIHelper {
 
     private void addLastnameField(Student student) {
         lastnameField = new TextField();
-        if (student != null) {
+        if (null != student) {
             lastnameField.setValue(student.getLastname());
         }
         lastnameField.setNullSettingAllowed(true);
@@ -209,7 +209,7 @@ public class StudentTable extends UIHelper {
         groupComboBoxField.setContainerDataSource(GroupTable.container);
         groupComboBoxField.setItemCaptionPropertyId("id");
         groupComboBoxField.setValidationVisible(false);
-        if (student != null) {
+        if (null != student) {
             List<GroupImpl> groupList = GroupTable.container.getItemIds();
             for (GroupImpl group : groupList) {
                 if (group.getId() == student.getGroup().getId()) {
