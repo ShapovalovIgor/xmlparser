@@ -11,11 +11,11 @@ public class Group implements GroupImpl {
     @Column(name = "id", nullable = false)
     private Integer id;
     @Column(name = "number", nullable = true)
-    private int number;
+    private Integer number;
     @Column(name = "faculty", nullable = true)
     private String faculty;
 
-    public Group(int number, String faculty) {
+    public Group(Integer number, String faculty) {
         this.number = number;
         this.faculty = faculty;
     }
@@ -27,11 +27,11 @@ public class Group implements GroupImpl {
         return id;
     }
 
-    public int getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(Integer number) {
         this.number = number;
     }
 

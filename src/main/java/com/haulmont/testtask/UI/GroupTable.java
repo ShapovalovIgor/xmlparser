@@ -89,23 +89,26 @@ public class GroupTable extends UIHelper {
     }
 
     private void addNumberField(Group group) {
-        if(null != group){
+        numberField = new TextField();
+        if (null != group) {
             numberField.setValue(String.valueOf(group.getNumber()));
         }
-        numberField = new TextField();
         numberField.setNullRepresentation("0");
         customIntegerRangeValidator = new CustomIntegerRangeValidator("Value must be a integer between 1 and 999999999", 1, 999999999);
         numberField.addValidator(customIntegerRangeValidator);
         numberField.setValidationVisible(false);
     }
+
     private void addFacultyField() {
         addFacultyField(null);
     }
+
     private void addFacultyField(Group group) {
-        if(null != group){
+        facultyField = new TextField();
+
+        if (null != group) {
             facultyField.setValue(group.getFaculty());
         }
-        facultyField = new TextField();
         facultyField.setNullSettingAllowed(true);
         facultyField.addValidator(new StringLengthValidator("The faculty must have 2 - 200", 2, 200, true));
         facultyField.setValidationVisible(false);
