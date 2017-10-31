@@ -1,32 +1,32 @@
 Test Task
 =========
 
-Branch mame: model_separation_2
-Interface application ingrid edition add external windows add item:
+Branch mame: model_separation_3
+Interface application external windows add item and edition item:
 
 Interface: Group:
 
-<img src="../master/path/2.1.jpg" width="350" height="250">
+<img src="../master/path/3.1.jpg" width="350" height="250">
 
 Interface: Edit Group:
 
-<img src="../master/path/2.2.jpg" width="350" height="250">
+<img src="../master/path/3.2.jpg" width="350" height="250">
 
 Interface: Add Group:
 
-<img src="../master/path/2.3.jpg" width="350" height="250">
+<img src="../master/path/3.3.jpg" width="350" height="250">
 
 Interface: Student:
 
-<img src="../master/path/2.4.jpg" width="350" height="250">
+<img src="../master/path/3.4.jpg" width="350" height="250">
 
 Interface: Edit Student:
 
-<img src="../master/path/2.5.jpg" width="350" height="250">
+<img src="../master/path/3.5.jpg" width="350" height="250">
 
 Interface: Add Student:
 
-<img src="../master/path/2.6.jpg" width="350" height="250">
+<img src="../master/path/3.6.jpg" width="350" height="250">
 
 Prerequisites
 -------------
