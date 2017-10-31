@@ -4,7 +4,7 @@ Test Task
 Branch mame: model_separation_3
 Interface application external windows add item and edition item:
 
-Interface: Group:
+Interface: Group find:
 
 <img src="../master/path/3.1.jpg" width="350" height="250">
 
@@ -16,7 +16,7 @@ Interface: Add Group:
 
 <img src="../master/path/3.3.jpg" width="350" height="250">
 
-Interface: Student:
+Interface: Student find:
 
 <img src="../master/path/3.4.jpg" width="350" height="250">
 
