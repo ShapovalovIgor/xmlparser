@@ -17,7 +17,7 @@ import java.util.Date;
 import static com.haulmont.testtask.MainUI.ui;
 
 
-public class GroupTable extends UIHelper {
+public class GroupTable extends UIHelper implements Table{
     private static final Label EDIT_GROUPS_LABLE = new Label("Edit Group");
     private static final Label NUMER_LABLE = new Label("Number: ");
     private static final Label FACULTY_LABLE = new Label("Faculty: ");
@@ -34,6 +34,13 @@ public class GroupTable extends UIHelper {
     private CustomIntegerRangeValidator customIntegerRangeValidator;
     private Window modalWindow;
     private Group editGroup;
+
+    public Window getModalWindow() {
+        return modalWindow;
+    }
+
+    public GroupTable() {
+    }
 
     public VerticalLayout table() {
         container = new BeanItemContainer<>(GroupImpl.class, MainUI.hibernateUtil.getGroup());
@@ -92,11 +99,15 @@ public class GroupTable extends UIHelper {
         numberField = new TextField();
         if (null != group) {
             numberField.setValue(String.valueOf(group.getNumber()));
+            numberField.setValidationVisible(true);
+        } else {
+            numberField.setValidationVisible(false);
         }
         numberField.setNullRepresentation("0");
         customIntegerRangeValidator = new CustomIntegerRangeValidator("Value must be a integer between 1 and 999999999", 1, 999999999);
         numberField.addValidator(customIntegerRangeValidator);
-        numberField.setValidationVisible(false);
+
+        numberField.setValidationVisible(true);
     }
 
     private void addFacultyField() {
@@ -132,12 +143,23 @@ public class GroupTable extends UIHelper {
         String numberString = numberField.getValue();
         String facultyString = facultyField.getValue();
 
-        Group group = MainUI.hibernateUtil.updateGroup(editGroup, Integer.valueOf(numberString), facultyString);
-        numberField.clear();
-        facultyField.clear();
-        grid.getContainerDataSource().addItem(group);
-        grid.clearSortOrder();
-        modalWindow.close();
+        if (isInteger(numberString)) {
+            if (numberString.length() < 10 && numberString.length() > 1) {
+                Group group = MainUI.hibernateUtil.updateGroup(editGroup, Integer.valueOf(numberString), facultyString);
+                numberField.clear();
+                facultyField.clear();
+                grid.getContainerDataSource().addItem(group);
+                grid.clearSortOrder();
+                modalWindow.close();
+            } else {
+                Notification.show("Lenght 2 - 9" + numberString, Notification.Type.WARNING_MESSAGE);
+
+            }
+
+        } else {
+            Notification.show("Cannot be parsed as Integer: " + numberString, Notification.Type.WARNING_MESSAGE);
+        }
+
     }
 
     private void removeItemListener(Button.ClickEvent clickEvent) {
@@ -167,7 +189,7 @@ public class GroupTable extends UIHelper {
         HorizontalLayout buttons = new HorizontalLayout();
 
         buttons.addComponent(addItemButton());
-        buttons.addComponent(addCancelButton(modalWindow));
+        buttons.addComponent(addCancelButton((Table) this));
         rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
         modalWindow = new Window("New Group", rootWindowsVerticalLayout);
         modalWindow.setModal(true);
@@ -196,7 +218,7 @@ public class GroupTable extends UIHelper {
             fieldLayout.addComponents(verticalLayoutFirstname, verticalLayoutLastname);
             HorizontalLayout buttons = new HorizontalLayout();
             buttons.addComponent(saveStudentButton());
-            buttons.addComponent(addCancelButton(modalWindow));
+            buttons.addComponent(addCancelButton((Table) this));
             rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
             modalWindow = new Window("Edit Group", rootWindowsVerticalLayout);
             modalWindow.setModal(true);

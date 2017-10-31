@@ -27,7 +27,7 @@ import java.util.Locale;
 import static com.haulmont.testtask.MainUI.ui;
 
 
-public class StudentTable extends UIHelper {
+public class StudentTable extends UIHelper implements Table{
     private static final Label EDIT_STUDENT_LABLE = new Label("Edit Student");
     private static final Label FIRSTNAME_LABLE = new Label("Firstname: ");
     private static final Label LASTNAME_LABLE = new Label("Lastname: ");
@@ -50,6 +50,10 @@ public class StudentTable extends UIHelper {
     private Button createStudentButton;
     private Window modalWindow;
     private Student editStudent;
+
+    public Window getModalWindow() {
+        return modalWindow;
+    }
 
     public StudentTable() {
     }
@@ -282,7 +286,7 @@ public class StudentTable extends UIHelper {
                 verticalLayoutLastname, verticalLayoutSecondname, verticalLayoutDOB, verticalLayoutGroup);
         HorizontalLayout buttons = new HorizontalLayout();
         buttons.addComponent(createStudentButton());
-        buttons.addComponent(addCancelButton(modalWindow));
+        buttons.addComponent(addCancelButton((Table) this));
         rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
         modalWindow = new Window("New Student", rootWindowsVerticalLayout);
         modalWindow.setModal(true);
@@ -319,7 +323,7 @@ public class StudentTable extends UIHelper {
                     verticalLayoutLastname, verticalLayoutSecondname, verticalLayoutDOB, verticalLayoutGroup);
             HorizontalLayout buttons = new HorizontalLayout();
             buttons.addComponent(saveStudentButton());
-            buttons.addComponent(addCancelButton(modalWindow));
+            buttons.addComponent(addCancelButton((Table) this));
             rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
             modalWindow = new Window("Edit Student", rootWindowsVerticalLayout);
             modalWindow.setModal(true);
