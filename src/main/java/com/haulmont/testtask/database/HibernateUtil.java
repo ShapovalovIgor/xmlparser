@@ -120,6 +120,31 @@ public class HibernateUtil {
         return true;
     }
 
+    public Student updateStudent(Student student, String firstname, String lastname, String secondname, Date dob, Group group) {
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        student.setFirstname(firstname);
+        student.setLastname(lastname);
+        student.setSecondname(secondname);
+        student.setDob(dob);
+        student.setGroup(group);
+        em.merge(student);
+        em.getTransaction().commit();
+        em.close();
+        return student;
+    }
+
+    public Group updateGroup(Group group, Integer number, String faculty) {
+        EntityManager em = getEm();
+        em.getTransaction().begin();
+        group.setNumber(number);
+        group.setFaculty(faculty);
+        em.merge(group);
+        em.getTransaction().commit();
+        em.close();
+        return group;
+    }
+
     public void newTestGroups() {
         EntityManager em = getEm();
         Group group = new Group();

@@ -2,22 +2,22 @@ package com.haulmont.testtask.UI;
 
 import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.DAO.GroupImpl;
+import com.haulmont.testtask.DAO.Student;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidator;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 
 import java.util.Collection;
+import java.util.Date;
 
 import static com.haulmont.testtask.MainUI.ui;
-import static java.awt.SystemColor.window;
 
 
-public class GroupTable {
+public class GroupTable extends UIHelper {
     private static final Label EDIT_GROUPS_LABLE = new Label("Edit Group");
     private static final Label NUMER_LABLE = new Label("Number: ");
     private static final Label FACULTY_LABLE = new Label("Faculty: ");
@@ -29,43 +29,38 @@ public class GroupTable {
     private TextField facultyField;
     private Button createGroupButton;
     private Button addItemButton;
+    private Button editItemButton;
     private Button removeItemButton;
     private CustomIntegerRangeValidator customIntegerRangeValidator;
     private Window modalWindow;
+    private Group editGroup;
 
     public VerticalLayout table() {
-        container = new BeanItemContainer<GroupImpl>(GroupImpl.class, MainUI.hibernateUtil.getGroup());
+        container = new BeanItemContainer<>(GroupImpl.class, MainUI.hibernateUtil.getGroup());
         grid = new Grid(container);
         grid.setColumnOrder("id", "number", "faculty");
-        grid.setEditorEnabled(true);
-        grid.getEditorFieldGroup().addCommitHandler(new FieldGroup.CommitHandler() {
-            @Override
-            public void preCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
-            }
-
-            @Override
-            public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
-                Group group = (Group) grid.getEditedItemId();
-                if (MainUI.hibernateUtil.updateGroup(group)) {
-                    Notification.show("Ok save", Notification.Type.TRAY_NOTIFICATION);
-                } else {
-                    Notification.show("Error save!", Notification.Type.WARNING_MESSAGE);
-                }
-            }
-        });
-        grid.getColumn("id").setEditable(false);
-        grid.setSelectionMode(Grid.SelectionMode.MULTI);
-        addNumberField();
-        addFacultyField();
-        addAddItemButton();
+        grid.setEditorEnabled(false);
         removeItemButton = new Button("Remove");
         removeItemButton.setStyleName("danger");
-
         removeItemButton.addClickListener(this::removeItemListener);
+        editItemButton();
         grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
         grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
         LAYOUT.addComponents(EDIT_GROUPS_LABLE, grid, sortComponetsLayout());
         return LAYOUT;
+    }
+
+    private void editItemButton() {
+        editItemButton = new Button("Edit group");
+        editItemButton.addClickListener(this::openWindowsEditGroup);
+        editItemButton.setStyleName("primary");
+    }
+
+    private Button saveStudentButton() {
+        addItemButton = new Button("Save");
+        addItemButton.setStyleName("friendly");
+        addItemButton.addClickListener(this::saveItemListener);
+        return addItemButton;
     }
 
     private Button addItemButton() {
@@ -84,7 +79,7 @@ public class GroupTable {
 
     private HorizontalLayout sortComponetsLayout() {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.addComponents(createGroupButton, removeItemButton);
+        horizontalLayout.addComponents(createGroupButton, editItemButton, removeItemButton);
         return horizontalLayout;
     }
 
@@ -117,6 +112,18 @@ public class GroupTable {
         modalWindow.close();
     }
 
+    private void saveItemListener(Button.ClickEvent clickEvent) {
+        String numberString = numberField.getValue();
+        String facultyString = facultyField.getValue();
+
+        Group group = MainUI.hibernateUtil.updateGroup(editGroup, Integer.valueOf(numberString), facultyString);
+        numberField.clear();
+        facultyField.clear();
+        grid.getContainerDataSource().addItem(group);
+        grid.clearSortOrder();
+        modalWindow.close();
+    }
+
     private void removeItemListener(Button.ClickEvent clickEvent) {
         Collection<Object> selectedRows = grid.getSelectedRows();
         selectedRows.remove(null);
@@ -132,6 +139,8 @@ public class GroupTable {
     }
 
     private void openWindowsCreateGroup(Button.ClickEvent clickEvent) {
+        addNumberField();
+        addFacultyField();
         VerticalLayout rootWindowsVerticalLayout = new VerticalLayout();
         HorizontalLayout fieldLayout = new HorizontalLayout();
         VerticalLayout verticalLayoutNumber = new VerticalLayout();
@@ -142,20 +151,44 @@ public class GroupTable {
         HorizontalLayout buttons = new HorizontalLayout();
 
         buttons.addComponent(addItemButton());
-        Button cancel = new Button("Cancel");
-        cancel.setStyleName("danger");
-        buttons.addComponent(cancel);
+        buttons.addComponent(addCancelButton(modalWindow));
         rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
         modalWindow = new Window("New Group", rootWindowsVerticalLayout);
-        cancel.addClickListener(e -> {
-            modalWindow.close();
-        });
         modalWindow.setModal(true);
         modalWindow.setResizable(false);
         modalWindow.setSizeUndefined();
         modalWindow.getContent().setSizeUndefined();
         modalWindow.center();
         ui.addWindow(modalWindow);
+    }
 
+
+    private void openWindowsEditGroup(Button.ClickEvent clickEvent) {
+        editGroup = (Group) grid.getSelectedRow();
+        if (editGroup == null) {
+            Notification.show("Is select student.", Notification.Type.WARNING_MESSAGE);
+        } else {
+            addNumberField();
+            addFacultyField();
+            addAddItemButton();
+            VerticalLayout rootWindowsVerticalLayout = new VerticalLayout();
+            HorizontalLayout fieldLayout = new HorizontalLayout();
+            VerticalLayout verticalLayoutFirstname = new VerticalLayout();
+            verticalLayoutFirstname.addComponents(NUMER_LABLE, numberField);
+            VerticalLayout verticalLayoutLastname = new VerticalLayout();
+            verticalLayoutLastname.addComponents(FACULTY_LABLE, facultyField);
+            fieldLayout.addComponents(verticalLayoutFirstname, verticalLayoutLastname);
+            HorizontalLayout buttons = new HorizontalLayout();
+            buttons.addComponent(saveStudentButton());
+            buttons.addComponent(addCancelButton(modalWindow));
+            rootWindowsVerticalLayout.addComponents(fieldLayout, buttons);
+            modalWindow = new Window("Edit Group", rootWindowsVerticalLayout);
+            modalWindow.setModal(true);
+            modalWindow.setResizable(false);
+            modalWindow.setSizeUndefined();
+            modalWindow.getContent().setSizeUndefined();
+            modalWindow.center();
+            ui.addWindow(modalWindow);
+        }
     }
 }
