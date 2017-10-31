@@ -12,6 +12,7 @@ import com.haulmont.testtask.Constant;
 import com.haulmont.testtask.DAO.Group;
 import com.haulmont.testtask.DAO.Student;
 import com.vaadin.server.VaadinService;
+import com.vaadin.ui.Notification;
 import org.hibernate.*;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -179,11 +180,11 @@ public class HibernateUtil {
 
     public boolean removeGroup(Group group) {
         EntityManager em = getEm();
-        List<Student> student = (ArrayList)
-                em.createQuery("SELECT n FROM student n WHERE n.group = ?1")
-                        .setParameter(1, group.getId()).getResultList();
+        List<Student> student = em.createQuery("SELECT n FROM student n WHERE n.group = ?1", Student.class)
+                .setParameter(1, group).getResultList();
+        Notification.show(student.toString() + student.size(), Notification.Type.TRAY_NOTIFICATION);
 
-        if (!student.isEmpty()) {
+        if (student.isEmpty()) {
             em.getTransaction().begin();
             em.remove(em.contains(group) ? group : em.merge(group));
             em.close();
