@@ -181,7 +181,8 @@ public class HibernateUtil {
         EntityManager em = getEm();
         List<Student> student = (ArrayList)
                 em.createQuery("SELECT n FROM student n WHERE n.group = ?1")
-                        .setParameter(1, group).setHint("org.hibernate.cacheMode", "IGNORE").getResultList();
+                        .setParameter(1, group.getId()).getResultList();
+
         if (!student.isEmpty()) {
             em.getTransaction().begin();
             em.remove(em.contains(group) ? group : em.merge(group));
