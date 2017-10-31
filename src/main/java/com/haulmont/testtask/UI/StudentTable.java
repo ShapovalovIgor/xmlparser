@@ -5,8 +5,6 @@ import com.haulmont.testtask.DAO.GroupImpl;
 import com.haulmont.testtask.DAO.Student;
 import com.haulmont.testtask.DAO.StudentImpl;
 import com.haulmont.testtask.MainUI;
-import com.haulmont.testtask.UI.vaadin.customfield.CustomComboBox;
-import com.haulmont.testtask.UI.vaadin.customfield.CustomPopupDateField;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.Sizeable;
@@ -42,8 +40,8 @@ public class StudentTable extends UIHelper implements Table{
     private TextField firstnameField;
     private TextField lastnameField;
     private TextField secondnameField;
-    private CustomPopupDateField dobDateField;
-    private CustomComboBox groupComboBoxField;
+    private PopupDateField dobDateField;
+    private ComboBox groupComboBoxField;
     private Button addItemButton;
     private Button editItemButton;
     private Button removeItemButton;
@@ -81,6 +79,8 @@ public class StudentTable extends UIHelper implements Table{
         removeItemButton.addClickListener(this::removeItemListener);
         addItemButton();
         editItemButton();
+        addFilterColumnValue(grid, container);
+        Grid.HeaderRow filterRow = grid.appendHeaderRow();
         grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
         grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
         LAYOUT.addComponents(EDIT_STUDENT_LABLE, grid, sortComponetsLayout());
@@ -172,7 +172,7 @@ public class StudentTable extends UIHelper implements Table{
     }
 
     private void addDOBField(Student student) {
-        dobDateField = new CustomPopupDateField();
+        dobDateField = new PopupDateField();
         if (null != student) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             dobDateField.setInputPrompt(dateFormat.format(student.getDob()));
@@ -206,7 +206,7 @@ public class StudentTable extends UIHelper implements Table{
     }
 
     private void addGroupField(Student student) {
-        groupComboBoxField = new CustomComboBox();
+        groupComboBoxField = new ComboBox();
         groupComboBoxField.setNullSelectionAllowed(false);
         groupComboBoxField.setFilteringMode(FilteringMode.CONTAINS);
         groupComboBoxField.setItemCaptionMode(AbstractSelect.ItemCaptionMode.PROPERTY);

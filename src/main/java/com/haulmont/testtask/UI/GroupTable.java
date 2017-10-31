@@ -7,6 +7,7 @@ import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidator;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
@@ -52,6 +53,7 @@ public class GroupTable extends UIHelper implements Table{
         removeItemButton.addClickListener(this::removeItemListener);
         addAddItemButton();
         editItemButton();
+        addFilterColumnValue(grid, container);
         grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
         grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
         LAYOUT.addComponents(EDIT_GROUPS_LABLE, grid, sortComponetsLayout());
