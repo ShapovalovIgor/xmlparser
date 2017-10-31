@@ -43,6 +43,7 @@ public class GroupTable extends UIHelper {
         removeItemButton = new Button("Remove");
         removeItemButton.setStyleName("danger");
         removeItemButton.addClickListener(this::removeItemListener);
+        addAddItemButton();
         editItemButton();
         grid.setWidth(100, Sizeable.Unit.PERCENTAGE);
         grid.setHeight(100, Sizeable.Unit.PERCENTAGE);
