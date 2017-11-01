@@ -3,7 +3,7 @@ package com.haulmont.testtask.DAO;
 import java.util.Date;
 
 public interface StudentImpl {
-    public Integer getId();
+    public long getId();
 
     public String getFirstname();
 

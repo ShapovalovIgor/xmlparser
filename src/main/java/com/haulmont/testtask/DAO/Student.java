@@ -9,7 +9,7 @@ public class Student implements StudentImpl{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
-    private int id;
+    private long id;
     @Column(name = "firstname", nullable = true)
     private String firstname;
     @Column(name = "lastname", nullable = true)
@@ -33,7 +33,7 @@ public class Student implements StudentImpl{
     public Student() {
     }
 
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 

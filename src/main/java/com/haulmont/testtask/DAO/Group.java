@@ -9,7 +9,7 @@ public class Group implements GroupImpl {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
 //    @OneToMany(mappedBy = "student_group", cascade = CascadeType.ALL, orphanRemoval = true)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private long id;
     @Column(name = "number", nullable = true)
     private int number;
     @Column(name = "faculty", nullable = true)
@@ -23,7 +23,7 @@ public class Group implements GroupImpl {
     public Group() {
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
