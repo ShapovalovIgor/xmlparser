@@ -6,6 +6,7 @@ import com.haulmont.testtask.MainUI;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.Sizeable;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.converters.DesignObjectConverter;
@@ -22,7 +23,7 @@ import java.util.Locale;
 import static com.haulmont.testtask.MainUI.ui;
 
 
-public class StudentTable extends UIHelper implements Table {
+public class StudentTable extends UIHelper implements Table{
     private static final Label EDIT_STUDENT_LABLE = new Label("Edit Student");
     private static final Label FIRSTNAME_LABLE = new Label("Firstname: ");
     private static final Label LASTNAME_LABLE = new Label("Lastname: ");
@@ -48,7 +49,7 @@ public class StudentTable extends UIHelper implements Table {
 
     @Override
     public Window getModalWindow() {
-        return modalWindow;
+        return null;
     }
 
     public StudentTable() {

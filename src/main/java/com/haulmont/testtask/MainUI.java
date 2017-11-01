@@ -15,7 +15,7 @@ import com.vaadin.ui.themes.ValoTheme;
 public class MainUI extends UI {
     public static HibernateUtil hibernateUtil = null;
     public static UI ui;
-    private TabSheet tabs;
+
 
     @Override
     protected void init(VaadinRequest request) {
@@ -35,7 +35,7 @@ public class MainUI extends UI {
         StudentTable studentTable = new StudentTable();
         VerticalLayout studentsTab = studentTable.table();
 
-        tabs = new TabSheet();
+        TabSheet tabs = new TabSheet();
         tabs.setSizeFull();
         tabs.addTab(groupsTab, "Group");
         tabs.addTab(studentsTab, "Student");

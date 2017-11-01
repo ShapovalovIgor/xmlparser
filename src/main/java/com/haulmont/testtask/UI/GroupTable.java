@@ -7,6 +7,7 @@ import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidat
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.Sizeable;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.converters.DesignObjectConverter;
 
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import static com.haulmont.testtask.MainUI.ui;
+
 
 public class GroupTable extends UIHelper implements Table {
     private static final Label EDIT_GROUPS_LABLE = new Label("Edit Group");
@@ -199,6 +201,7 @@ public class GroupTable extends UIHelper implements Table {
         modalWindow.getContent().setSizeUndefined();
         modalWindow.center();
         ui.addWindow(modalWindow);
+
     }
 
 
