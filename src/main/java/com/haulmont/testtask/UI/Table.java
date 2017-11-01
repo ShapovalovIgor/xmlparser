@@ -5,6 +5,4 @@ import com.vaadin.ui.Window;
 
 public interface Table {
     public Window getModalWindow();
-//    public Window getContener();
-
 }

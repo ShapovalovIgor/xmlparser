@@ -1,9 +1,7 @@
 package com.haulmont.testtask.UI;
 
 import com.haulmont.testtask.DAO.Group;
-import com.haulmont.testtask.DAO.GroupImpl;
 import com.haulmont.testtask.DAO.Student;
-import com.haulmont.testtask.DAO.StudentImpl;
 import com.haulmont.testtask.MainUI;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.StringLengthValidator;
@@ -13,7 +11,6 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.converters.DesignObjectConverter;
 import com.vaadin.ui.renderers.DateRenderer;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -25,7 +22,7 @@ import java.util.Locale;
 import static com.haulmont.testtask.MainUI.ui;
 
 
-public class StudentTable extends UIHelper implements Table{
+public class StudentTable extends UIHelper implements Table {
     private static final Label EDIT_STUDENT_LABLE = new Label("Edit Student");
     private static final Label FIRSTNAME_LABLE = new Label("Firstname: ");
     private static final Label LASTNAME_LABLE = new Label("Lastname: ");
@@ -36,7 +33,7 @@ public class StudentTable extends UIHelper implements Table{
     private static final VerticalLayout LAYOUT = new VerticalLayout();
 
     private Grid grid;
-    private BeanItemContainer<StudentImpl> container;
+    private BeanItemContainer<Student> container;
     private TextField firstnameField;
     private TextField lastnameField;
     private TextField secondnameField;
@@ -49,6 +46,7 @@ public class StudentTable extends UIHelper implements Table{
     private Window modalWindow;
     private Student editStudent;
 
+    @Override
     public Window getModalWindow() {
         return modalWindow;
     }
@@ -57,7 +55,7 @@ public class StudentTable extends UIHelper implements Table{
     }
 
     public VerticalLayout table() {
-        container = new BeanItemContainer<>(StudentImpl.class, MainUI.hibernateUtil.getStudent());
+        container = new BeanItemContainer<>(Student.class, MainUI.hibernateUtil.getStudent());
         grid = new Grid(container);
         grid.setColumnOrder("id", "firstname", "lastname", "secondname", "dob", "group");
         grid.getColumn("group").setConverter(new DesignObjectConverter() {
@@ -214,8 +212,8 @@ public class StudentTable extends UIHelper implements Table{
         groupComboBoxField.setItemCaptionPropertyId("id");
         groupComboBoxField.setValidationVisible(false);
         if (null != student) {
-            List<GroupImpl> groupList = GroupTable.container.getItemIds();
-            for (GroupImpl group : groupList) {
+            List<Group> groupList = GroupTable.container.getItemIds();
+            for (Group group : groupList) {
                 if (group.getId() == student.getGroup().getId()) {
                     groupComboBoxField.setValue(group);
                 }
@@ -256,12 +254,9 @@ public class StudentTable extends UIHelper implements Table{
     }
 
     private void removeItemListener(Button.ClickEvent clickEvent) {
-        Collection<Object> selectedRows = grid.getSelectedRows();
-        selectedRows.remove(null);
-        for (Object item : selectedRows) {
-            MainUI.hibernateUtil.removeStudent((Student) item);
-            grid.getContainerDataSource().removeItem(item);
-        }
+        Student student = (Student) grid.getSelectedRow();
+            MainUI.hibernateUtil.removeStudent(student);
+            grid.getContainerDataSource().removeItem(student);
     }
 
     private void openWindowsCreateStudent(Button.ClickEvent clickEvent) {

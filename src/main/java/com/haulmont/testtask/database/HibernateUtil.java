@@ -26,6 +26,7 @@ import org.hibernate.exception.ConstraintViolationException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;
 
@@ -186,6 +187,10 @@ public class HibernateUtil {
 
         if (student.isEmpty()) {
             em.getTransaction().begin();
+            String deleteGroup = "delete from student_group where id = :id";
+            Query query = em.createQuery(deleteGroup);
+            query.setParameter("id", group.getId());
+            query.executeUpdate();
             em.remove(em.contains(group) ? group : em.merge(group));
             em.close();
             return true;

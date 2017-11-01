@@ -1,31 +1,28 @@
 package com.haulmont.testtask.UI;
 
 import com.haulmont.testtask.DAO.Group;
-import com.haulmont.testtask.DAO.GroupImpl;
 import com.haulmont.testtask.DAO.Student;
 import com.haulmont.testtask.MainUI;
 import com.haulmont.testtask.UI.vaadin.customvalidator.CustomIntegerRangeValidator;
-import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
+import com.vaadin.ui.declarative.converters.DesignObjectConverter;
 
 import java.util.Collection;
-import java.util.Date;
+import java.util.Locale;
 
 import static com.haulmont.testtask.MainUI.ui;
 
-
-public class GroupTable extends UIHelper implements Table{
+public class GroupTable extends UIHelper implements Table {
     private static final Label EDIT_GROUPS_LABLE = new Label("Edit Group");
     private static final Label NUMER_LABLE = new Label("Number: ");
     private static final Label FACULTY_LABLE = new Label("Faculty: ");
     private static final VerticalLayout LAYOUT = new VerticalLayout();
 
-    private Grid grid;
-    protected static BeanItemContainer<GroupImpl> container;
+    private static Grid grid;
+    protected static BeanItemContainer<Group> container;
     private TextField numberField;
     private TextField facultyField;
     private Button createGroupButton;
@@ -36,6 +33,7 @@ public class GroupTable extends UIHelper implements Table{
     private Window modalWindow;
     private Group editGroup;
 
+    @Override
     public Window getModalWindow() {
         return modalWindow;
     }
@@ -44,7 +42,8 @@ public class GroupTable extends UIHelper implements Table{
     }
 
     public VerticalLayout table() {
-        container = new BeanItemContainer<>(GroupImpl.class, MainUI.hibernateUtil.getGroup());
+        container = new BeanItemContainer<>(Group.class, MainUI.hibernateUtil.getGroup());
+        container.removeContainerProperty("students");
         grid = new Grid(container);
         grid.setColumnOrder("id", "number", "faculty");
         grid.setEditorEnabled(false);

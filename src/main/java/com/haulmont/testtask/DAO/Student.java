@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name = "student")
-public class Student implements StudentImpl{
+public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
