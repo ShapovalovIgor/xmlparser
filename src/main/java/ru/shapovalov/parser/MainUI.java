@@ -1,11 +1,11 @@
-package com.zcts.parser;
+package ru.shapovalov.parser;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.*;
-import com.zcts.parser.xml.SearchResult;
+import ru.shapovalov.parser.xml.SearchResult;
 
 @SuppressWarnings("serial")
 @Theme("vaadinbutton")

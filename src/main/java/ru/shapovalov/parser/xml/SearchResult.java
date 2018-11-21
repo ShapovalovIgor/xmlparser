@@ -1,5 +1,5 @@
 
-package com.zcts.parser.xml;
+package ru.shapovalov.parser.xml;
 
 import javax.xml.bind.annotation.*;
 import javax.xml.datatype.XMLGregorianCalendar;

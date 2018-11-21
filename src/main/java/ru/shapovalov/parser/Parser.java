@@ -1,7 +1,7 @@
-package com.zcts.parser;
+package ru.shapovalov.parser;
 
 import com.vaadin.server.VaadinService;
-import com.zcts.parser.xml.SearchResult;
+import ru.shapovalov.parser.xml.SearchResult;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

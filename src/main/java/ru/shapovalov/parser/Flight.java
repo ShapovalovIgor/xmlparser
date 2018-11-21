@@ -1,4 +1,4 @@
-package com.zcts.parser;
+package ru.shapovalov.parser;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
