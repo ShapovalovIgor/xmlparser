@@ -1,46 +1,22 @@
-Test Task
+Тестовое задание для одной из компаний поддерживающей бизнес процессов авиоперелётчиков
 =========
 
-Branch mame: model_separation_3
-Interface application external windows add item and edition item:
+На основе XML файла backend_xml_responce.xml, приложенного к ТЗ, написать вывод офферов перелетов на странице,
+с формированием фильтров по Аэропортам и Авиакомпаниям, включенных в данный перелет:
 
-Interface: Group find:
+1. Создание страницы списка предложений по перелетам.
+2. Разбор XML файла.
+3. Вывод полученных из XML файла данных на страницу в виде списка (Секция Offers). Каждый элемент списка должен содержать:
 
-<img src="../master/path/3.1.jpg" width="350" height="250">
+a. Код авиакомпании и номер рейса, осуществляющего перелет, в формате «UT-500»;
+b. Время вылета и время прилета;
+c. Время в пути (используются атрибуты Duration или DurationMS);
+d. Если перелет в обе стороны, показать его в вышеуказанном формате (используется атрибут SegmentId, который если 0, то перелет в одну сторону, 1 — перелет обратно);
+e. Указать, если перелет комбинированный (используется атрибут IsCombined);
+f. Указать, если чартерный рейс (используется атрибут charter);
+g. Итоговая цену оффера.
 
-Interface: Edit Group:
+4. В шапке списка сформировать фильтр Аэропорты. Создать возможность фильтровать перелеты по этому списку.
+5. В шапке списка сформировать фильтр Авиакомпании. Создать возможность фильтровать перелеты по этому списку.
 
-<img src="../master/path/3.2.jpg" width="350" height="250">
-
-Interface: Add Group:
-
-<img src="../master/path/3.3.jpg" width="350" height="250">
-
-Interface: Student find:
-
-<img src="../master/path/3.4.jpg" width="350" height="250">
-
-Interface: Edit Student:
-
-<img src="../master/path/3.5.jpg" width="350" height="250">
-
-Interface: Add Student:
-
-<img src="../master/path/3.6.jpg" width="350" height="250">
-
-Prerequisites
--------------
-
-* [Java Development Kit (JDK) 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* [Maven 3](https://maven.apache.org/download.cgi)
-
-Build and Run
--------------
-
-1. Run in the command line:
-	```
-	mvn package
-	mvn jetty:run
-	```
-
-2. Open `http://localhost:8080` in a web browser.
+Так же, на странице вывести информер, который будет показывать время разбора XML файла и время отработки скрипта вывода данных.
